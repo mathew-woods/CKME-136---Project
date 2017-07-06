@@ -1,0 +1,111 @@
+ gho <- read_xlsx("greenhouse1ON.xlsx")
+ ghc <- read_xlsx("greenhouse1CA.xlsx")
+ ## Split the greenhouse1.xlsx file into Ontario and Canadian sections ##
+ ## Both of which have been cleaned, organized, and transposed ##
+ class(gho)
+
+ gho <- as.data.frame(gho)
+ ghc <- as.data.frame(ghc)
+ ## Converts gho&ghc lists into data frames ##
+ head(gho)
+ summary(gho)
+
+ gho1 <- gho[,c(1:3, 14:17, 19)]
+ ## Removes irrelevant attributes and places useful ones into ghc1 data frame ##
+ class(gho1)
+ gho1$Item <- c(1996:2016)
+ ## This converts the Item attribute (character) into numeric ##
+ str(gho1)
+ cor(gho1)
+ ## Creates a correlation matrix which displays how the attributes are related##
+ 
+ plot(gho1$Item ~ gho1$`Total greenhouses (no.)`)
+ plot(gho1$`Total greenhouses (no.)` ~ gho1$Item)
+ ## Displays that the total number of greenhouses have decreased annually ##
+ ## The trend is linear and the attributes are negatively correlated ##
+ 
+ View(gho1)
+ plot(gho1$`Total greenhouses (no.)` ~ gho1$`Total employees(b)(no.)`)
+ plot(gho1$`Total greenhouses (no.)` ~ gho1$Item)
+ plot(gho1$`Total greenhouses (no.)` ~ gho1$`Total employees(b)(no.)`)
+ plot(gho1$Item ~ gho1$`Total employees(b)(no.)`)
+ plot(gho1$`Total employees(b)(no.)` ~ gho1$Item)
+ ## The number of individuals employed increased in Ontario to a maximum in 2004-2005 ##
+ ## which then started decreasing annually ##
+ 
+ plot(gho1$Item ~ gho1$`Total fuel cost ($'000)`)
+ plot(gho1$`Total fuel cost ($'000)` ~ gho1$Item)
+ ## This plot describes a relationship that is either positive linear or asymptotic ##
+ ## This may be due to increasing fuel costs or fuel usage ##
+ 
+ plot(gho1$`Total  Greenhouse Sales ($'000)` ~ gho1$Item)
+ ## This relation is highly linear and positive ##
+ 
+ plot(gho1$`Plastic ('000 sq m)` ~ gho1$Item)
+ plot(gho1$`Glass ('000 sq m)` ~ gho1$Item)
+ ## These plots show that annual size of both glass & plastic greenhouses have increased linearly ##
+ 
+ gho1.pca <- prcomp(gho1, center = TRUE, scale = TRUE)
+ print(gho1.pca)
+ plot(gho1.pca)
+ ## Use PCA to determine which of the atrributes in the data explains the most variance in the dataset ##
+ 
+ lm(formula = gho1$`Total  Greenhouse Sales ($'000)` ~ gho1[,7] + gho1[,8] + gho1[,1], data = gho1)
+ ## Basic regression model for predicting total greenhouse sales using item(year), total payroll,
+ ## and fuel cost##
+ 
+ 
+ ghc <- read_xlsx("greenhouse1CAN.xlsx")
+ head(ghc)
+ 
+ ghc <- as.data.frame(ghc)
+ ## Converts ghc into a data frame ##
+ str(ghc)
+ names(ghc)[1] <- paste("Item")
+ ## Changes name of first attribute in ghc to Item ##
+ ghc[,1] <- c(1996:2016)
+ ## Converts first attribute in ghc into numeric type ##
+ ghc1 <- ghc[,c(1:3,14:17, 19)]
+ ## Moves useful attributes into another data frame named ghc1 ##
+ 
+ cor(ghc1)
+ ## Creates correlation matrix of ghc1 attributes ##
+ 
+ plot(ghc1$Item ~ ghc1$`Total payroll ($'000)`)
+ plot(ghc1$`Total payroll ($'000)`, ghc1$Item)
+ plot(ghc1$Item, ghc1$`Total payroll ($'000)`)
+ ## The relationship between Item and total payroll in positive and highly linear ##
+ 
+ plot(ghc1$`Plastic ('000 sq m)`, ghc1[,8])
+ ## This plot displays the relationship between fuel cost and plastic greenhouse size is 
+ ## positively correlated (larger facilities would use more fuel) and linear ##
+ 
+ plot(ghc1$`Glass ('000 sq m)`, ghc1[,8])
+ ## The relationship between glass greenhouses and fuel cost is positively correlated ##
+ ## although they asymptotic. It levels off around 6K-7K (000) sq m ##
+ 
+ plot(ghc1$`Total greenhouses (no.)`, ghc1[,4])
+ ## The number of greenhouses and greenhouse sales are negatively correlated and linear ##
+ ## This could mean that their are fewer greenhouses in Canada which are getting larger in size ##
+ ## and more productive ##
+ 
+ plot(ghc1$`Total  Greenhouse Sales ($'000)`, ghc1[,6])
+ plot(ghc1$`Total employees(b)(no.)`, ghc1[,4])
+ ## The relationship between total greenhouse sales and total number of employees appears to ##
+ ## be parabolic in nature. This could be due to the automation of greenhouse systems ##
+ 
+ plot(ghc1$`Total  Greenhouse Sales ($'000)`, ghc1[,8])
+ plot(ghc1$`Total fuel cost ($'000)`, ghc1[,4])
+ ## Total greenhouse sales and fuel cost are positively correlated although the ##
+ ## relationship is only slightly linear/random ##
+ 
+ ghc1.pca <- prcomp(ghc1, center = TRUE, scale = TRUE)
+ print(ghc1.pca)
+ plot(ghc1.pca)
+ ## PCA analysis shows that the first two principle components explains the majority of variance ##
+ ## found in the Canadian greenhouse data ##
+ 
+ lm(ghc1$`Total  Greenhouse Sales ($'000)` ~ ghc1[,1] + ghc1[,7], data = ghc1)
+ lm(ghc1$`Total  Greenhouse Sales ($'000)` ~ ghc1[,1] + ghc1[,7] + ghc1[,8], data = ghc1)
+ ## Possible statistical models which could predict the total greenhouse sales in Canada using ##
+ ## item(year), total payroll, and fuel cost ##
